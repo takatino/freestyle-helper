@@ -6,8 +6,8 @@ canvas.height = window.innerHeight;
 
 const loopspeed = 10;
 
-const maxwords_onscreen = Math.floor(0.00004 * canvas.width * canvas.height);
-const fontsize = Math.floor(0.035 * canvas.width);
+const maxwords_onscreen = 36;
+const fontsize = Math.floor(0.02 * canvas.width + 16);
 
 rhymeDict = {};
 $.get({

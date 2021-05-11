@@ -4,10 +4,24 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+// get current size of the canvas
+rect = canvas.getBoundingClientRect();
+
+// increase the actual size of our canvas
+canvas.width = rect.width * devicePixelRatio;
+canvas.height = rect.height * devicePixelRatio;
+
+// ensure all drawing operations are scaled
+ctx.scale(devicePixelRatio, devicePixelRatio);
+
+// scale everything down using CSS
+canvas.style.width = rect.width + 'px';
+canvas.style.height = rect.height + 'px';
+
 const loopspeed = 10;
 
-const maxwords_onscreen = 36;
-const fontsize = Math.floor(0.02 * canvas.width + 16);
+const maxwords_onscreen = 64;
+const fontsize = Math.floor(0.02 * rect.width + 16);
 
 rhymeDict = {};
 $.get({
@@ -22,7 +36,7 @@ queue = [];
 onScreen = [];
 
 function setup() {
-    for (i = 0; i < 10; i++) {
+    while (queue.length < maxwords_onscreen + 1) {
         getrhymes();
     }
 }
@@ -37,20 +51,19 @@ function draw() {
 }
 
 function update() {
-    while (queue.length < 12) {
+    while (queue.length < maxwords_onscreen + 1) {
         getrhymes();
     }
 
     while (onScreen.length < maxwords_onscreen) {
-        newword = queue.pop()
-        onScreen.push([newword, Math.floor(Math.random() * (canvas.width - 48*newword.length)), Math.floor(Math.random() * -canvas.height), 0.5*Math.random()+0.5]);
+        onScreen.push(queue.pop());
         //[wordstring, x, y, speed]
     }
 
     tempOSL = onScreen.length;
     for (i = tempOSL - 1; i >= 0; i--) {
         onScreen[i][2] += onScreen[i][3];
-        if (onScreen[i][2] > canvas.height + 100) {
+        if (onScreen[i][2] > rect.height + fontsize*devicePixelRatio) {
             onScreen.splice(i, 1);
         }
     }
@@ -71,9 +84,15 @@ function getrhymes() { //stores random rhyming words into queue
         randselector.push(x);
     }
     
-
+    zone = [Math.floor(Math.random() * (rect.width -  fontsize *devicePixelRatio * 5)), Math.floor(Math.random() * rect.height / 3)];
+    radius = rect.width / 5;
     for (i of randselector) {
-        queue.push(tempRhymes[i]);
+        do {
+            newx = zone[0] + Math.floor(Math.random() * radius - 0.5 * radius);
+        } while (newx < 0 || newx > rect.width - tempRhymes[i].length*fontsize*devicePixelRatio);
+        newy = (-rect.height + zone[1] + Math.floor(Math.random() * 2 * radius - radius)) - radius;
+        newspeed = 0.1*(Math.random() + Math.random()) +0.3;
+        queue.push([tempRhymes[i], newx, newy, newspeed]);
     }
 }
 
@@ -83,7 +102,7 @@ setup();
 
 let main = setInterval(() => {
     update();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, rect.width, rect.height);
     draw();
 
 }, loopspeed);  

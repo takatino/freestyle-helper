@@ -95,14 +95,14 @@ function getrhymes() { //stores random rhyming words into queue
         randselector.push(x);
     }
     
-    zone = [Math.floor(Math.random() * (rect.width -  fontsize *devicePixelRatio * 5)), Math.floor(Math.random() * rect.height - 2 * fontsize *devicePixelRatio)];
+    zone = [Math.floor(Math.random() * (rect.width - fontsize * 4)), Math.floor(Math.random() * rect.height - 2 * fontsize * 1.5)];
     radius = rect.width / 4;
     for (i of randselector) {
         do {
             newx = zone[0] + Math.floor(Math.random() * 2 * radius - radius) / 2;
-        } while (newx < 0 || newx > rect.width - tempRhymes[i].length*fontsize*devicePixelRatio);
+        } while (newx < 0 || newx > rect.width - 1.1*tempRhymes[i].length*fontsize);
         newy = -rect.height + zone[1] + Math.floor(Math.random() * 2 * radius - radius)/4;
-        newspeed = 0.1*(Math.random() + Math.random()) +0.3;
+        newspeed = 0.1*(Math.random() + Math.random()) + 5.3;
         queue.push([tempRhymes[i], newx, newy, newspeed]);
     }
 }

@@ -20,7 +20,7 @@ canvas.style.height = rect.height + 'px';
 
 const loopspeed = 10;
 
-const maxwords_onscreen = 64;
+const maxwords_onscreen = 36;
 const fontsize = Math.floor(0.02 * rect.width + 16);
 
 rhymeDict = {};
@@ -34,6 +34,7 @@ $.get({
 
 queue = [];
 onScreen = [];
+offScreen = [];
 
 function setup() {
     while (queue.length < maxwords_onscreen + 1) {
@@ -55,18 +56,28 @@ function update() {
         getrhymes();
     }
 
-    while (onScreen.length < maxwords_onscreen) {
-        onScreen.push(queue.pop());
+    while (offScreen.length < maxwords_onscreen) {
+        offScreen.push(queue.pop());
         //[wordstring, x, y, speed]
     }
 
-    tempOSL = onScreen.length;
-    for (i = tempOSL - 1; i >= 0; i--) {
+    tempOnSL = onScreen.length;
+    for (i = tempOnSL - 1; i >= 0; i--) {
         onScreen[i][2] += onScreen[i][3];
         if (onScreen[i][2] > rect.height + fontsize*devicePixelRatio) {
             onScreen.splice(i, 1);
         }
     }
+
+    tempOffSL = offScreen.length;
+    for (i = tempOffSL - 1; i >= 0; i--) {
+        offScreen[i][2] += offScreen[i][3];
+        if (offScreen[i][2] > -10 -fontsize*devicePixelRatio) {
+            onScreen.push(offScreen[i]);
+            offScreen.splice(i, 1);
+        }
+    }
+
 }
 
 
@@ -84,13 +95,13 @@ function getrhymes() { //stores random rhyming words into queue
         randselector.push(x);
     }
     
-    zone = [Math.floor(Math.random() * (rect.width -  fontsize *devicePixelRatio * 5)), Math.floor(Math.random() * rect.height / 3)];
-    radius = rect.width / 5;
+    zone = [Math.floor(Math.random() * (rect.width -  fontsize *devicePixelRatio * 5)), Math.floor(Math.random() * rect.height - 2 * fontsize *devicePixelRatio)];
+    radius = rect.width / 4;
     for (i of randselector) {
         do {
-            newx = zone[0] + Math.floor(Math.random() * radius - 0.5 * radius);
+            newx = zone[0] + Math.floor(Math.random() * 2 * radius - radius) / 2;
         } while (newx < 0 || newx > rect.width - tempRhymes[i].length*fontsize*devicePixelRatio);
-        newy = (-rect.height + zone[1] + Math.floor(Math.random() * 2 * radius - radius)) - radius;
+        newy = -rect.height + zone[1] + Math.floor(Math.random() * 2 * radius - radius)/4;
         newspeed = 0.1*(Math.random() + Math.random()) +0.3;
         queue.push([tempRhymes[i], newx, newy, newspeed]);
     }

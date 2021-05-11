@@ -18,7 +18,6 @@ ctx.scale(devicePixelRatio, devicePixelRatio);
 canvas.style.width = rect.width + 'px';
 canvas.style.height = rect.height + 'px';
 
-const loopspeed = 10;
 
 const maxwords_onscreen = 36;
 const fontsize = Math.floor(0.02 * rect.width + 16);
@@ -72,7 +71,7 @@ function update() {
     tempOffSL = offScreen.length;
     for (i = tempOffSL - 1; i >= 0; i--) {
         offScreen[i][2] += offScreen[i][3];
-        if (offScreen[i][2] > -10 -fontsize*devicePixelRatio) {
+        if (offScreen[i][2] > -10 - fontsize * devicePixelRatio) {
             onScreen.push(offScreen[i]);
             offScreen.splice(i, 1);
         }
@@ -97,24 +96,30 @@ function getrhymes() { //stores random rhyming words into queue
     
     zone = [Math.floor(Math.random() * (rect.width - fontsize * 4)), Math.floor(Math.random() * rect.height - 2 * fontsize * 1.5)];
     radius = rect.width / 4;
-    for (i of randselector) {
-        do {
-            newx = zone[0] + Math.floor(Math.random() * 2 * radius - radius) / 2;
-        } while (newx < 0 || newx > rect.width - 1.1*tempRhymes[i].length*fontsize);
+    for (x = 0; x < randselector.length; x++) {
+        i = randselector[x];
+        newx = zone[0] + Math.floor(Math.random() * 2 * radius - radius)/2 ;
+        if (newx < 0) {
+            newx = 0;
+        }
+        else if (newx > rect.width - 1.1 * fontsize * tempRhymes[i].length) {
+            newx = rect.width - 1.1 * fontsize * tempRhymes[i].length;
+        }
         newy = -rect.height + zone[1] + Math.floor(Math.random() * 2 * radius - radius)/4;
-        newspeed = 0.1*(Math.random() + Math.random()) + 5.3;
+        newspeed = 0.2*(Math.random()) + 0.3;
         queue.push([tempRhymes[i], newx, newy, newspeed]);
     }
 }
 
 
-
-setup();
-
-let main = setInterval(() => {
+function main() {
     update();
     ctx.clearRect(0, 0, rect.width, rect.height);
     draw();
+    window.requestAnimationFrame(main);
+}
 
-}, loopspeed);  
+setup();
+
+window.requestAnimationFrame(main);
 
